@@ -140,7 +140,7 @@
                 <span class="help-icon" data-help="The amount you invest every month into NPS.">❓</span>
             </div>
             <div class="slider-wrapper">
-                <input type="range" id="monthlyInvestmentSlider" min="1000" max="100000" value="5000" step="1000" oninput="syncInput('monthlyInvestment', 'monthlyInvestmentSlider')">
+                <input type="range" id="monthlyInvestmentSlider" min="1000" max="200000" value="5000" step="1000" oninput="syncInput('monthlyInvestment', 'monthlyInvestmentSlider')">
             </div>
             <div class="input-group">
                 <label for="annualRate">Expected Annual Return Rate (%):</label>
@@ -156,7 +156,7 @@
                 <span class="help-icon" data-help="The total duration in years for which you will invest in NPS.">❓</span>
             </div>
             <div class="slider-wrapper">
-                <input type="range" id="yearsSlider" min="1" max="40" value="20" step="1" oninput="syncInput('years', 'yearsSlider')">
+                <input type="range" id="yearsSlider" min="4" max="70" value="20" step="1" oninput="syncInput('years', 'yearsSlider')">
             </div>
             <div class="input-group">
                 <label for="stepUp">Yearly Step-Up Increase (%):</label>
@@ -178,6 +178,7 @@
         </div>
     </div>
     <div class="section-c">
+	<h1>Yearly Breakdown</h1>
         <div id="yearlyGrowth"></div>
     </div>
     <script>
