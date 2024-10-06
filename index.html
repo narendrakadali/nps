@@ -232,9 +232,9 @@ function calculateNPS() {
     const xirr = calculateXIRR(totalInvested, finalAmount, years);
 
     // Update summary section
-    document.getElementById('totalInvestedAmount').innerText = totalInvested.toFixed(2);
-    document.getElementById('totalInterestEarned').innerText = interestEarned.toFixed(2);
-    document.getElementById('totalAmount').innerText = finalAmount.toFixed(2);
+    document.getElementById('totalInvestedAmount').innerText = formatNumberWithCommas(totalInvested.toFixed(0));
+    document.getElementById('totalInterestEarned').innerText = formatNumberWithCommas(interestEarned.toFixed(0));
+    document.getElementById('totalAmount').innerText = formatNumberWithCommas(finalAmount.toFixed(0));
 
     // Display Pie Chart
     const ctx = document.getElementById('npsChart').getContext('2d');
@@ -301,20 +301,20 @@ function calculateXIRR(totalInvested, finalAmount, years) {
 
 function resetCalculator() {
     document.getElementById('monthlyInvestment').value = 5000;
-    document.getElementById('annualRate').value = 10;
-    document.getElementById('years').value = 20;
+    document.getElementById('annualRate').value = 8;
+    document.getElementById('years').value = 14;
     document.getElementById('stepUp').value = 5;
 
     document.getElementById('monthlyInvestmentSlider').value = 5000;
-    document.getElementById('annualRateSlider').value = 10;
-    document.getElementById('yearsSlider').value = 20;
+    document.getElementById('annualRateSlider').value = 8;
+    document.getElementById('yearsSlider').value = 14;
     document.getElementById('stepUpSlider').value = 5;
 
     calculateNPS();
 }
 
  function formatNumberWithCommas(number) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return number.toString().replace(/(\d)(?=(\d\d)+\d$)/g, "$1,");
         }
 		
 window.onload = function() {
@@ -325,6 +325,14 @@ window.onload = function() {
                 };
             }
         };
+		// Update summary with formatted numbers
+            const totalInvestedElement = document.getElementById('totalInvestedAmount');
+            const totalInterestEarnedElement = document.getElementById('totalInterestEarned');
+            const totalAmountElement = document.getElementById('totalAmount');
+
+            totalInvestedElement.innerText = formatNumberWithCommas(totalInvestedElement.innerText);
+            totalInterestEarnedElement.innerText = formatNumberWithCommas(totalInterestEarnedElement.innerText);
+            totalAmountElement.innerText = formatNumberWithCommas(totalAmountElement.innerText);
 	
 	</script>
 </body>
