@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPS Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f8fb;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .section-a, .section-b, .section-c {
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section-a, .section-b {
+            flex: 1;
+            min-width: 300px;
+        }
+        .section-c {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .input-group label {
+            font-weight: 500;
+            margin-right: 10px;
+            width: 40%;
+        }
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .slider-wrapper {
+            margin-top: 10px;
+            width: 90%;
+        }
+        .slider-wrapper input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .help-icon {
+            cursor: pointer;
+            font-size: 16px;
+            color: #007bff;
+            margin-left: 8px;
+            position: relative;
+        }
+        .help-icon:hover::after {
+            content: attr(data-help);
+            position: absolute;
+            top: 25px;
+            left: 0;
+            width: 200px;
+            background: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            line-height: 1.4;
+            z-index: 10;
+        }
+        .reset-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .reset-btn:hover {
+            background-color: #0056b3;
+        }
+        #npsChart {
+            margin-top: 20px;
+        }
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+        }
+        th {
+            background-color: #f4f8fb;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-a">
+            <h2>NPS Calculator</h2>
+            <div class="input-group">
+                <label for="monthlyInvestment">Monthly Investment (INR):</label>
+                <input type="number" id="monthlyInvestment" value="5000" oninput="syncSlider('monthlyInvestment', 'monthlyInvestmentSlider'); calculateNPS();">
+                <span class="help-icon" data-help="The amount you invest every month into NPS.">❓</span>
+            </div>
+            <div class="slider-wrapper">
+                <input type="range" id="monthlyInvestmentSlider" min="1000" max="100000" value="5000" step="1000" oninput="syncInput('monthlyInvestment', 'monthlyInvestmentSlider')">
+            </div>
+            <div class="input-group">
+                <label for="annualRate">Expected Annual Return Rate (%):</label>
+                <input type="number" id="annualRate" value="10" oninput="syncSlider('annualRate', 'annualRateSlider'); calculateNPS();">
+                <span class="help-icon" data-help="The expected annual rate of return on your investment.">❓</span>
+            </div>
+            <div class="slider-wrapper">
+                <input type="range" id="annualRateSlider" min="1" max="20" value="10" step="0.1" oninput="syncInput('annualRate', 'annualRateSlider')">
+            </div>
+            <div class="input-group">
+                <label for="years">Investment Period (Years):</label>
+                <input type="number" id="years" value="20" oninput="syncSlider('years', 'yearsSlider'); calculateNPS();">
+                <span class="help-icon" data-help="The total duration in years for which you will invest in NPS.">❓</span>
+            </div>
+            <div class="slider-wrapper">
+                <input type="range" id="yearsSlider" min="1" max="40" value="20" step="1" oninput="syncInput('years', 'yearsSlider')">
+            </div>
+            <div class="input-group">
+                <label for="stepUp">Yearly Step-Up Increase (%):</label>
+                <input type="number" id="stepUp" value="5" oninput="syncSlider('stepUp', 'stepUpSlider'); calculateNPS();">
+                <span class="help-icon" data-help="The percentage increase in your monthly contribution every year.">❓</span>
+            </div>
+            <div class="slider-wrapper">
+                <input type="range" id="stepUpSlider" min="0" max="20" value="5" step="0.5" oninput="syncInput('stepUp', 'stepUpSlider')">
+            </div>
+            <button class="reset-btn" onclick="resetCalculator()">Reset</button>
+        </div>
+        <div class="section-b">
+            <canvas id="npsChart" width="400" height="200"></canvas>
+            <div class="summary">
+                <p><strong>Total Invested Amount:</strong> <span id="totalInvestedAmount">0</span> INR</p>
+                <p><strong>Total Interest Earned:</strong> <span id="totalInterestEarned">0</span> INR</p>
+                <p><strong>Total Amount (Investment + Interest):</strong> <span id="totalAmount">0</span> INR</p>
+            </div>
+        </div>
+    </div>
+    <div class="section-c">
+        <div id="yearlyGrowth"></div>
+    </div>
+    <script>
+	
+	function syncInput(inputId, sliderId) {
+    const input = document.getElementById(inputId);
+    const slider = document.getElementById(sliderId);
+    input.value = slider.value;
+    calculateNPS();
+}
+
+function syncSlider(inputId, sliderId) {
+    const input = document.getElementById(inputId);
+    const slider = document.getElementById(sliderId);
+    slider.value = input.value;
+}
+
+function calculateNPS() {
+    let monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value);
+    const annualRate = parseFloat(document.getElementById('annualRate').value) / 100;
+    const years = parseInt(document.getElementById('years').value);
+    const stepUp = parseFloat(document.getElementById('stepUp').value) / 100;
+    const currentYear = new Date().getFullYear();
+
+    if (isNaN(monthlyInvestment) || isNaN(annualRate) || isNaN(years) || isNaN(stepUp)) {
+        return;
+    }
+
+    let totalInvested = 0;
+    let finalAmount = 0;
+    let yearlyData = [];
+
+    for (let year = 1; year <= years; year++) {
+        let yearlyInvestment = monthlyInvestment * 12;
+        for (let month = 1; month <= 12; month++) {
+            finalAmount = finalAmount * (1 + annualRate / 12) + monthlyInvestment;
+        }
+        totalInvested += yearlyInvestment;
+        yearlyData.push({
+            year: year,
+            yyyy: currentYear + year - 1,
+            monthlyInvestment: monthlyInvestment,
+            invested: totalInvested,
+            yearlyInvestment: yearlyInvestment,
+            finalAmount: finalAmount
+        });
+        monthlyInvestment *= (1 + stepUp); // Apply step-up increase
+    }
+
+    const interestEarned = finalAmount - totalInvested;
+    const cagr = (((finalAmount / totalInvested) ** (1 / years)) - 1) * 100;
+    const xirr = calculateXIRR(totalInvested, finalAmount, years);
+
+    // Update summary section
+    document.getElementById('totalInvestedAmount').innerText = totalInvested.toFixed(2);
+    document.getElementById('totalInterestEarned').innerText = interestEarned.toFixed(2);
+    document.getElementById('totalAmount').innerText = finalAmount.toFixed(2);
+
+    // Display Pie Chart
+    const ctx = document.getElementById('npsChart').getContext('2d');
+    if (window.npsChart && typeof window.npsChart.destroy === 'function') {
+        window.npsChart.destroy();
+    }
+    window.npsChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Total Invested', 'Interest Earned'],
+            datasets: [{
+                data: [totalInvested, interestEarned],
+                backgroundColor: ['#007bff', '#28a745'],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw.toFixed(2)} INR`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Display Yearly Growth Table
+    let tableHtml = `<table>
+        <tr>
+            <th>Year</th>
+            <th>YYYY</th>
+            <th>Monthly Investment (INR)</th>
+            <th>Yearly Investment (INR)</th>
+            <th>Total Invested (INR)</th>
+            <th>Final Amount (INR)</th>
+        </tr>`;
+
+    yearlyData.forEach((data, index) => {
+        const rowClass = index % 2 === 0 ? 'style="background-color: #f9f9f9;"' : '';
+        tableHtml += `<tr ${rowClass}>
+            <td>${data.year}</td>
+            <td>${data.yyyy}</td>
+            <td>${data.monthlyInvestment.toFixed(2)}</td>
+            <td>${data.yearlyInvestment.toFixed(2)}</td>
+            <td>${data.invested.toFixed(2)}</td>
+            <td>${data.finalAmount.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    tableHtml += `</table>`;
+    document.getElementById('yearlyGrowth').innerHTML = tableHtml;
+}
+
+function calculateXIRR(totalInvested, finalAmount, years) {
+    // Simple approximation for XIRR (using CAGR approximation)
+    return (((finalAmount / totalInvested) ** (1 / years)) - 1) * 100;
+}
+
+function resetCalculator() {
+    document.getElementById('monthlyInvestment').value = 5000;
+    document.getElementById('annualRate').value = 10;
+    document.getElementById('years').value = 20;
+    document.getElementById('stepUp').value = 5;
+
+    document.getElementById('monthlyInvestmentSlider').value = 5000;
+    document.getElementById('annualRateSlider').value = 10;
+    document.getElementById('yearsSlider').value = 20;
+    document.getElementById('stepUpSlider').value = 5;
+
+    calculateNPS();
+}
+
+ function formatNumberWithCommas(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+		
+window.onload = function() {
+ resetCalculator();
+            if (window.npsChart) {
+                window.npsChart.options.plugins.tooltip.callbacks.label = function(context) {
+                    return `${context.label}: ${formatNumberWithCommas(context.raw.toFixed(2))} INR`;
+                };
+            }
+        };
+	
+	</script>
+</body>
+</html>
